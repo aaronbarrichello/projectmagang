@@ -78,7 +78,7 @@ class RequestController extends Controller
         $spkName = null;
         if ($request->hasFile('spk')) {
             $spkName = '/file/spk/' . time() . '.' . $request['spk']->extension();
-            Storage::disk('public')->putFileAs('/file/spk/', $request['spk'], time() . '.' . $request['spk']->extension());
+            Storage::disk('ftp')->putFileAs(env('APP_FDIR').'/file/spk/', $request['spk'], time() . '.' . $request['spk']->extension());
         }
 
         $requestData = ModelsRequest::create([
@@ -90,7 +90,7 @@ class RequestController extends Controller
         ]);
         foreach ($request->visitors as $key => $visitor) {
             $ktpName = '/img/ktp/' . time() . '.' . $visitor['file_ktp']->extension();
-            Storage::disk('public')->putFileAs('/img/ktp/', $visitor['file_ktp'], time() . '.' . $visitor['file_ktp']->extension());
+            Storage::disk('ftp')->putFileAs(env('APP_FDIR').'/img/ktp/', $visitor['file_ktp'], time() . '.' . $visitor['file_ktp']->extension());
 
             $visitorData = Visitor::create([
                 'ktp' => $visitor['ktp'],
@@ -147,8 +147,8 @@ class RequestController extends Controller
             }
 
             $qrCode = QrCode::format('png')->size(256)->generate($requestData->uuid);
-            $filename = '/img/qr-code/img-' . time() . '.png';
-            Storage::disk('public')->put($filename, $qrCode);
+            $filename = env('APP_FDIR').'/img/qr-code/img-' . time() . '.png';
+            Storage::disk('ftp')->put($filename, $qrCode);
             $requestData->update([
                 'qrcode' => $filename
             ]);

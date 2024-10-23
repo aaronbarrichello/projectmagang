@@ -56,6 +56,17 @@ return [
             'throw' => false,
         ],
 
+        'ftp' => [
+            'driver'   => 'ftp',
+            'host'     => '10.252.252.145',
+            'username' => 'igracias',
+            'password' => 'igracias',
+            'port'     => 21,
+            'root'     => '',
+            'passive'  => true,
+            'ssl'      => false,
+            'timeout'  => 30,
+        ],
     ],
 
     /*
