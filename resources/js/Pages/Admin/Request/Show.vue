@@ -125,7 +125,7 @@ function acceptance(id, action) {
                             </td>
                             <td data-label="spk">
                                 <BaseButton
-                                    :href="'../storage' + data.spk"
+                                    :href=data.spk
                                     :icon="mdiDownload"
                                     class="lg:w-[120px]"
                                     label="Download"
@@ -200,7 +200,7 @@ function acceptance(id, action) {
                             </td>
                             <td data-label="Foto KTP / Passport">
                                 <img
-                                        :src="'../storage' + visitor.file_ktp"
+                                        :src=visitor.file_ktp
                                         class="p-2 lg:p-3 bg-white mb-3 w-[200px]"
                                     />
                             </td>
