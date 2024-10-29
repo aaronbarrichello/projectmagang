@@ -1,0 +1,106 @@
+stages:
+  - build
+  - push
+
+build_to_MR:
+  image: docker:20
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - echo "No job runs in merge request pipelines"
+
+build_to_staging: 
+  image: docker:20
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "staging" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  stage: build
+  script:
+    - echo "building..."
+    - echo "$STG_DOCKERFILE" > Dockerfile
+    - echo "$STG_ENV" > .env
+    - cat Dockerfile
+    - cat .env
+    - docker login -u="$STG_CI_REGISTRY_USER" -p="$STG_CI_REGISTRY_PASSWORD"
+    - docker build --no-cache --network host -f Dockerfile -t telkomuniversity/puti-vam-stg:$CI_COMMIT_SHORT_SHA .
+    - rm .env
+  after_script:
+    - echo "$STG_NOTIFY_SH" > notify.sh
+    - chmod +x notify.sh 
+    - if [ "$CI_JOB_STATUS" == "success" ]; then sh notify.sh "Image has been built ✅";
+      elif [ "$CI_JOB_STATUS" == "failed" ]; then sh notify.sh "Image build failed ❌";
+      elif [ "$CI_JOB_STATUS" == "canceled" ]; then sh notify.sh "Image build canceled ❌";
+      else echo "Unknown status = $CI_JOB_STATUS"; fi
+    - rm -f *.sh
+
+push_to_staging:
+  image: docker:20
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "staging" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  stage: push
+  script:
+    - echo "deploying..."
+    - docker push telkomuniversity/puti-vam-stg:$CI_COMMIT_SHORT_SHA
+    - echo "$STG_UNUSED_IMAGE_1" > STG_UNUSED_IMAGE_1.sh
+    - chmod +x STG_UNUSED_IMAGE_1.sh
+    - bash STG_UNUSED_IMAGE_1.sh
+    - echo "$STG_UNUSED_IMAGE_2" > STG_UNUSED_IMAGE_2.sh
+    - chmod +x STG_UNUSED_IMAGE_2.sh
+    - bash STG_UNUSED_IMAGE_2.sh
+  after_script:
+    - echo "$STG_NOTIFY_SH" > notify.sh
+    - chmod +x notify.sh 
+    - if [ "$CI_JOB_STATUS" == "success" ]; then sh notify.sh "Image successfully pushed ✅";
+      elif [ "$CI_JOB_STATUS" == "failed" ]; then sh notify.sh "Image push failed ❌";
+      elif [ "$CI_JOB_STATUS" == "canceled" ]; then sh notify.sh "Image push canceled ❌";
+      else echo "Unknown status = $CI_JOB_STATUS"; fi
+    - rm -f *.sh
+    
+build_to_production:
+  image: docker:20
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  stage: build
+
+  script:
+    - echo "building..."
+  #   - echo "$PROD_NOTIFY_SH" > notify.sh
+  #   - chmod +x notify.sh
+  #   - echo "$PROD_DOCKERFILE" > Dockerfile
+  #   - echo "$PROD_ENV" > .env
+  #   - cat Dockerfile
+  #   - cat .env
+  #   - docker login -u="$PROD_CI_REGISTRY_USER" -p="$PROD_CI_REGISTRY_PASSWORD"
+  #   - docker build --no-cache --network host -f Dockerfile -t telkomuniversity/puti-vam:$CI_COMMIT_SHORT_SHA .
+  #   - rm .env
+  # after_script:
+  #   - echo "Job Status = $CI_JOB_STATUS .."
+  #   - if [ "$CI_JOB_STATUS" == "success" ]; then sh notify.sh "Image has been built ✅";
+  #     elif [ "$CI_JOB_STATUS" == "failed" ]; then sh notify.sh "Image build failed ❌";
+  #     elif [ "$CI_JOB_STATUS" == "canceled" ]; then sh notify.sh "Image build canceled ❌";
+  #     else echo "Unknown status = $CI_JOB_STATUS"; fi
+  #   - rm -f *.sh
+
+push_to_production:
+  image: docker:20
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"
+  stage: push
+  script:
+    - echo "pushing..."
+  #   - echo "$PROD_NOTIFY_SH" > notify.sh
+  #   - chmod +x notify.sh
+  #   - docker push telkomuniversity/puti-vam:$CI_COMMIT_SHORT_SHA
+  #   - echo "$PROD_UNUSED_IMAGE_1" > PROD_UNUSED_IMAGE_1.sh
+  #   - chmod +x PROD_UNUSED_IMAGE_1.sh
+  #   - bash PROD_UNUSED_IMAGE_1.sh
+  #   - echo "$PROD_UNUSED_IMAGE_2" > PROD_UNUSED_IMAGE_2.sh
+  #   - chmod +x PROD_UNUSED_IMAGE_2.sh
+  #   - bash PROD_UNUSED_IMAGE_2.sh
+  # after_script:
+  #   - echo "Job Status = $CI_JOB_STATUS .."
+  #   - if [ "$CI_JOB_STATUS" == "success" ]; then sh notify.sh "Image successfully pushed ✅";
+  #     elif [ "$CI_JOB_STATUS" == "failed" ]; then sh notify.sh "Image push failed ❌";
+  #     elif [ "$CI_JOB_STATUS" == "canceled" ]; then sh notify.sh "Image push canceled ❌";
+  #     else echo "Unknown status = $CI_JOB_STATUS"; fi
+  #   - rm -f *.sh
