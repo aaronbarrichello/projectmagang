@@ -59,8 +59,8 @@ return [
         'ftp' => [
             'driver'   => 'ftp',
             'host'     => '10.252.252.145',
-            'username' => 'igracias',
-            'password' => 'igracias',
+            'username' => 'vamdc',
+            'password' => 's0TuFHX9',
             'port'     => 21,
             'root'     => '',
             'passive'  => true,
