@@ -59,7 +59,7 @@ push_to_staging:
 build_to_production:
   image: docker:20
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_COMMIT_REF_NAME == "main" && $CI_PIPELINE_SOURCE != "merge_request_event"
   stage: build
 
   script:
@@ -84,7 +84,7 @@ build_to_production:
 push_to_production:
   image: docker:20
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master" && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_COMMIT_REF_NAME == "main" && $CI_PIPELINE_SOURCE != "merge_request_event"
   stage: push
   script:
     - echo "pushing..."
