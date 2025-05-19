@@ -58,17 +58,26 @@ const clearFilter = () => {
 };
 
 function formatDateTime(datetime) {
-    const date = new Date(datetime);
+    const date = new Date(datetime + "Z");
+    const options = { timeZone: "Asia/Jakarta" };
 
-    // Ambil waktu lokal (bukan UTC)
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, "0");
-    const day = `${date.getDate()}`.padStart(2, "0");
-    const hours = `${date.getHours()}`.padStart(2, "0");
-    const minutes = `${date.getMinutes()}`.padStart(2, "0");
-    const seconds = `${date.getSeconds()}`.padStart(2, "0");
+    const year = date.toLocaleString("id-ID", { ...options, year: "numeric" });
+    const month = date.toLocaleString("id-ID", {
+        ...options,
+        month: "2-digit",
+    });
+    const day = date.toLocaleString("id-ID", { ...options, day: "2-digit" });
+    const hour = date
+        .toLocaleString("id-ID", { ...options, hour: "2-digit", hour12: false })
+        .padStart(2, "0");
+    const minute = date
+        .toLocaleString("id-ID", { ...options, minute: "2-digit" })
+        .padStart(2, "0");
+    const second = date
+        .toLocaleString("id-ID", { ...options, second: "2-digit" })
+        .padStart(2, "0");
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
 }
 </script>
 

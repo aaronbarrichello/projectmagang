@@ -93,6 +93,29 @@ const checked = (isChecked, client) => {
         );
     }
 };
+
+function formatDateTime(datetime) {
+    const date = new Date(datetime + "Z");
+    const options = { timeZone: "Asia/Jakarta" };
+
+    const year = date.toLocaleString("id-ID", { ...options, year: "numeric" });
+    const month = date.toLocaleString("id-ID", {
+        ...options,
+        month: "2-digit",
+    });
+    const day = date.toLocaleString("id-ID", { ...options, day: "2-digit" });
+    const hour = date
+        .toLocaleString("id-ID", { ...options, hour: "2-digit", hour12: false })
+        .padStart(2, "0");
+    const minute = date
+        .toLocaleString("id-ID", { ...options, minute: "2-digit" })
+        .padStart(2, "0");
+    const second = date
+        .toLocaleString("id-ID", { ...options, second: "2-digit" })
+        .padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+}
 </script>
 
 <template>
@@ -125,7 +148,13 @@ const checked = (isChecked, client) => {
             <thead>
                 <tr>
                     <th v-if="checkable" />
-                    <th v-for="(item, index) in columns" :key="index" class="whitespace-nowrap">{{ item }}</th>
+                    <th
+                        v-for="(item, index) in columns"
+                        :key="index"
+                        class="whitespace-nowrap"
+                    >
+                        {{ item }}
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -135,11 +164,12 @@ const checked = (isChecked, client) => {
                         @checked="checked($event, client)"
                     />
                     <td class="whitespace-nowrap" data-label="Start Date">
-                        {{ data.start_date }}
+                        {{ formatDateTime(data.start_date) }}
                     </td>
                     <td class="whitespace-nowrap" data-label="End Date">
-                        {{ data.end_date }}
+                        {{ formatDateTime(data.end_date) }}
                     </td>
+
                     <td class="text-center" data-label="Visit Purpose">
                         {{ data.visit_purpose }}
                     </td>

@@ -59,10 +59,14 @@ class RequestController extends Controller
             Storage::putFileAs(env('APP_FDIR') . '/file/spk', $request->file('spk'), time() . '.' . $request->file('spk')->extension());
         }
 
+        // Perbaikan: Pastikan waktu disimpan dengan timezone yang benar
+        $startDate = Carbon::parse($request->start_date)->setTimezone('UTC');
+        $endDate = Carbon::parse($request->end_date)->setTimezone('UTC');
+
         $requestData = ModelsRequest::create([
             'visit_purpose' => $request->visit_purpose,
-            'start_date' => Carbon::parse($request->start_date),
-            'end_date' => Carbon::parse($request->end_date),
+            'start_date' => $startDate,
+            'end_date' => $endDate,
             'description' => $request->description,
             'spk' => $spkName ? env('APP_FDIR_URL') . env('APP_FDIR') . $spkName : null
         ]);
@@ -102,42 +106,42 @@ class RequestController extends Controller
 
     public function store(StoreVisitRequest $request)
     {
-        $this->storeVisit($request);
-        return redirect()->route('request.index')->with('message', __('Request created successfully.'));
+        return $this->storeVisit($request);
     }
 
-public function acceptance($id, $action)
-{
-    $modelsRequest = ModelsRequest::findOrFail($id);
 
-    $validActions = [
-        'accept' => 'accepted',
-        'reject' => 'rejected',
-        'finished' => 'finished',
-        'missed' => 'missed',
-    ];
+    public function acceptance($id, $action)
+    {
+        $modelsRequest = ModelsRequest::findOrFail($id);
 
-    if (!array_key_exists($action, $validActions)) {
+        $validActions = [
+            'accept' => 'accepted',
+            'reject' => 'rejected',
+            'finished' => 'finished',
+            'missed' => 'missed',
+        ];
+
+        if (!array_key_exists($action, $validActions)) {
+            return redirect()->back()->with([
+                'message' => 'Invalid action.',
+                'color' => 'danger',
+            ]);
+        }
+
+        $modelsRequest->status = $validActions[$action];
+        $modelsRequest->save();
+
         return redirect()->back()->with([
-            'message' => 'Invalid action.',
-            'color' => 'danger',
+            'message' => 'Request has been ' . $validActions[$action] . '.',
+            'color' => match ($action) {
+                'accept' => 'success',
+                'reject' => 'danger',
+                'finished' => 'success',
+                'missed' => 'warning',
+                default => 'info',
+            },
         ]);
     }
-
-    $modelsRequest->status = $validActions[$action];
-    $modelsRequest->save();
-
-    return redirect()->back()->with([
-        'message' => 'Request has been ' . $validActions[$action] . '.',
-        'color' => match ($action) {
-            'accept' => 'success',
-            'reject' => 'danger',
-            'finished' => 'success',
-            'missed' => 'warning',
-            default => 'info',
-        },
-    ]);
-}
 
     public function showKtp($id)
     {
