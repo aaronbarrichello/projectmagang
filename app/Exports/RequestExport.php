@@ -33,7 +33,7 @@ class RequestExport implements FromQuery, WithMapping, WithHeadings
             $data->visit_purpose,
             $data->status,
             $data->description,
-            $data->visitors->where('pic', 1)->first()->name
+            $data->visitors,
         ];
     }
 

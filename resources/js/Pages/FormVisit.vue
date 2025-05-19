@@ -1,8 +1,7 @@
 <script setup>
 import BaseButton from "@/Components/BaseButton.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import { mdiPlus, mdiSend, mdiTelevisionGuide } from "@mdi/js";
-import { mdiAlertBoxOutline } from "@mdi/js";
+import { mdiPlus, mdiSend, mdiTelevisionGuide, mdiAlertBoxOutline } from "@mdi/js";
 import VisitDetail from "./Admin/Request/partials/VisitDetail.vue";
 import VisitorList from "./Admin/Request/partials/VisitorList.vue";
 import NotificationBar from "@/Components/NotificationBar.vue";
@@ -33,43 +32,42 @@ const terms = ref(false);
 const dataVisitors = reactive([initialVisitor]);
 
 const addVisitor = () => {
-    dataVisitors.push({
-        ktp: "",
-        name: "",
-        file_ktp: "",
-        company: "",
-        occupation: "",
-        phone: "",
-        email: "",
-        show: true,
-    });
+    dataVisitors.push({ ...initialVisitor });
 };
 
-const toggleShowVisitor = (index) =>
-    (dataVisitors[index].show = !dataVisitors[index].show);
+const toggleShowVisitor = (index) => {
+    dataVisitors[index].show = !dataVisitors[index].show;
+};
 
-const deleteVisitor = (index) => dataVisitors.splice(index, 1);
+const deleteVisitor = (index) => {
+    dataVisitors.splice(index, 1);
+};
 
 const submit = () => {
     form.visitors = dataVisitors;
-    form.post(route("form.visit.store"));
+    form.post(route("form.visit.store"), {
+        onSuccess: () => {
+            form.reset(); // Reset form setelah submit
+            dataVisitors.splice(0, dataVisitors.length, { ...initialVisitor }); // Reset daftar visitor
+            terms.value = false; // Reset checkbox terms
+            
+            // Refresh halaman untuk memastikan input benar-benar bersih
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }
+    });
 };
 </script>
 
 <template>
     <LayoutGuest>
         <Head title="Form" />
-        <div
-            class="relative min-h-screen flex flex-col items-center selection:bg-blue-500 selection:text-white"
-        >
+        <div class="relative min-h-screen flex flex-col items-center selection:bg-blue-500 selection:text-white">
             <NotificationBar
                 :key="Date.now()"
                 v-if="$page.props.flash.message"
-                :color="
-                    $page.props.flash.color == null
-                        ? 'success'
-                        : $page.props.flash.color
-                "
+                :color="$page.props.flash.color == null ? 'success' : $page.props.flash.color"
                 :icon="mdiAlertBoxOutline"
                 class="m-5 w-1/2"
             >
@@ -117,9 +115,7 @@ const submit = () => {
                             </div>
                         </div>
                         <div class="w-full lg:w-50">
-                            <div
-                                class="border-b border-slate-400 pb-4 flex justify-between"
-                            >
+                            <div class="border-b border-slate-400 pb-4 flex justify-between">
                                 <h1 class="text-3xl">Visitor List</h1>
                                 <BaseButton
                                     @click="addVisitor"

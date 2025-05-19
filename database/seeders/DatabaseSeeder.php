@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+
+use Database\Seeders\UserSeeder;
 use App\Models\Request;
 use App\Models\User;
 use App\Models\Visitor;
@@ -62,57 +64,57 @@ class DatabaseSeeder extends Seeder
         $role2->givePermissionTo('request-delete');
 
 
-        // seeder request & visitor
-        $request1 = Request::create([
-            'visit_purpose' => 'Data Center',
-            'start_date' => Carbon::now()->subMonth()->format('Y-m-d H:i:s'),
-            'end_date' => Carbon::now()->subMonth()->format('Y-m-d H:i:s'),
-            'description' => 'ini deskripsinya',
-            'status' => 'requested'
-        ]);
-        $visitor1 = Visitor::create([
-            'ktp' => '32712931203123',
-            'name' => 'wenner',
-            'file_ktp' => 'ktp\32712931203123.jpg',
-            'company' => 'PT Ayam',
-            'occupation' => 'CEO',
-            'phone' => '081923819123',
-            'email' => 'wennerfrederikus@gmail.com',
-            'pic' => true
-        ]);
+        // // seeder request & visitor
+        // $request1 = Request::create([
+        //     'visit_purpose' => 'Data Center',
+        //     'start_date' => Carbon::now()->subMonth()->format('Y-m-d H:i:s'),
+        //     'end_date' => Carbon::now()->subMonth()->format('Y-m-d H:i:s'),
+        //     'description' => 'ini deskripsinya',
+        //     'status' => 'requested'
+        // ]);
+        // $visitor1 = Visitor::create([
+        //     'ktp' => '32712931203123',
+        //     'name' => 'wenner',
+        //     'file_ktp' => 'ktp\32712931203123.jpg',
+        //     'company' => 'PT Ayam',
+        //     'occupation' => 'CEO',
+        //     'phone' => '081923819123',
+        //     'email' => 'wennerfrederikus@gmail.com',
+        //     'pic' => true
+        // ]);
        
-        $request1->visitors()->attach($visitor1->id);
+        // $request1->visitors()->attach($visitor1->id);
 
-        $request2 = Request::create([
-            'visit_purpose' => 'Network Center',
-            'start_date' => Carbon::now()->format('Y-m-d H:i:s'),
-            'end_date' => Carbon::now()->format('Y-m-d H:i:s'),
-            'description' => 'ini deskripsinya 2',
-            'status' => 'requested'
-        ]);
-        $visitor2 = Visitor::create([
-            'ktp' => '32712931203121',
-            'name' => 'adhimas',
-            'file_ktp' => 'ktp\32712931203121.jpg',
-            'company' => 'PT Bebek',
-            'occupation' => 'Sekretaris',
-            'phone' => '081923819121',
-            'email' => 'tahtaadhimas123@gmail.com',
-            'pic' => true
-        ]);
-        $visitor3 = Visitor::create([
-            'ktp' => '32712931203122',
-            'name' => 'sonny',
-            'file_ktp' => 'ktp\32712931203122.jpg',
-            'company' => 'PT Sapi',
-            'occupation' => 'Sekretaris',
-            'phone' => '081923819121',
-            'email' => 'sonnyaa@mail.com',
-            'pic' => false
-        ]);
+        // $request2 = Request::create([
+        //     'visit_purpose' => 'Network Center',
+        //     'start_date' => Carbon::now()->format('Y-m-d H:i:s'),
+        //     'end_date' => Carbon::now()->format('Y-m-d H:i:s'),
+        //     'description' => 'ini deskripsinya 2',
+        //     'status' => 'requested'
+        // ]);
+        // $visitor2 = Visitor::create([
+        //     'ktp' => '32712931203121',
+        //     'name' => 'adhimas',
+        //     'file_ktp' => 'ktp\32712931203121.jpg',
+        //     'company' => 'PT Bebek',
+        //     'occupation' => 'Sekretaris',
+        //     'phone' => '081923819121',
+        //     'email' => 'tahtaadhimas123@gmail.com',
+        //     'pic' => true
+        // ]);
+        // $visitor3 = Visitor::create([
+        //     'ktp' => '32712931203122',
+        //     'name' => 'sonny',
+        //     'file_ktp' => 'ktp\32712931203122.jpg',
+        //     'company' => 'PT Sapi',
+        //     'occupation' => 'Sekretaris',
+        //     'phone' => '081923819121',
+        //     'email' => 'sonnyaa@mail.com',
+        //     'pic' => false
+        // ]);
        
-        $request2->visitors()->attach($visitor2->id);
-        $request2->visitors()->attach($visitor3->id);
+        // $request2->visitors()->attach($visitor2->id);
+        // $request2->visitors()->attach($visitor3->id);
 
         
     }

@@ -53,8 +53,22 @@ function acceptance(id, action) {
 }
 
 const clearFilter = () => {
-    formFilter.status = null
-    formFilter.get(route('request.index'))
+    formFilter.status = null;
+    formFilter.get(route("request.index"));
+};
+
+function formatDateTime(datetime) {
+    const date = new Date(datetime);
+
+    // Ambil waktu lokal (bukan UTC)
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, "0");
+    const day = `${date.getDate()}`.padStart(2, "0");
+    const hours = `${date.getHours()}`.padStart(2, "0");
+    const minutes = `${date.getMinutes()}`.padStart(2, "0");
+    const seconds = `${date.getSeconds()}`.padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 </script>
 
@@ -66,17 +80,7 @@ const clearFilter = () => {
                 :icon="mdiOfficeBuildingMarker"
                 title="Visit Request"
                 main
-            >
-                <BaseButton
-                    v-if="can.create"
-                    :route-name="route('request.create')"
-                    :icon="mdiPlus"
-                    label="Add"
-                    color="info"
-                    rounded-full
-                    small
-                />
-            </SectionTitleLineWithButton>
+            />
             <NotificationBar
                 :key="Date.now()"
                 v-if="$page.props.flash.message"
@@ -89,6 +93,7 @@ const clearFilter = () => {
             >
                 {{ $page.props.flash.message }}
             </NotificationBar>
+
             <CardBox class="mb-6" has-table>
                 <div class="py-2 flex flex-col lg:flex-row lg:justify-between">
                     <div class="flex items-end pl-4">
@@ -121,20 +126,29 @@ const clearFilter = () => {
                                     class="min-w-[200px]"
                                     v-model="formFilter.status"
                                     type="select"
-                                    :options="['requested', 'accepted', 'rejected', 'finished', 'missed']"
+                                    :options="[
+                                        'requested',
+                                        'accepted',
+                                        'rejected',
+                                        'finished',
+                                        'missed',
+                                    ]"
                                     options-is-value
                                     change-is-submit
-                                    :show-clear-button="formFilter.status !== null"
+                                    :show-clear-button="
+                                        formFilter.status !== null
+                                    "
                                     @clear="clearFilter"
                                     @submitForm="
                                         formFilter.get(route('request.index'))
                                     "
-                                ></FormControl>
+                                />
                             </FormField>
                         </form>
                     </div>
                 </div>
             </CardBox>
+
             <CardBox class="mb-6" has-table>
                 <table>
                     <thead>
@@ -162,53 +176,111 @@ const clearFilter = () => {
                     <tbody v-if="requests.data.length > 0">
                         <tr v-for="request in requests.data" :key="request.id">
                             <td data-label="Start Date">
-                                {{ request.start_date }}
+                                {{ formatDateTime(request.start_date) }}
                             </td>
                             <td data-label="End Date">
-                                {{ request.end_date }}
+                                {{ formatDateTime(request.end_date) }}
                             </td>
                             <td data-label="Roles">
                                 {{ request.visit_purpose }}
                             </td>
                             <td data-label="Visitor PIC">
-                                <Link
-                                    :href="route('request.show', request.id)"
-                                    class="no-underline hover:underline text-cyan-600 dark:text-cyan-400"
-                                >
-                                    {{ getPIC(request.visitors) }}
-                                </Link>
+                                <template v-if="getPIC(request.visitors)">
+                                    <span class="block">{{
+                                        getPIC(request.visitors)
+                                    }}</span>
+
+                                    <a
+                                        :href="
+                                            route(
+                                                'admin.visitor.ktp',
+                                                request.visitors.find(
+                                                    (v) => v.file_ktp
+                                                )?.id
+                                            )
+                                        "
+                                        class="text-sm text-blue-500 hover:underline"
+                                        target="_blank"
+                                        v-if="
+                                            request.visitors.find(
+                                                (v) => v.file_ktp
+                                            )?.id
+                                        "
+                                    >
+                                        View KTP
+                                    </a>
+                                </template>
                             </td>
                             <td data-label="Status" class="text-center">
                                 <Badge :data="request.status" />
                             </td>
                             <td class="before:hidden lg:w-1 whitespace-nowrap">
-                                <div
-                                    v-if="
-                                        can.acceptance &&
-                                        request.status === 'requested'
-                                    "
-                                >
-                                    <BaseButtons
-                                        type="justify-start lg:justify-end"
-                                        no-wrap
+                                <div v-if="can.acceptance">
+                                    <template
+                                        v-if="request.status === 'requested'"
                                     >
-                                        <BaseButton
-                                            color="info"
-                                            :icon="mdiCheck"
-                                            small
-                                            @click="
-                                                acceptance(request.id, 'accept')
-                                            "
-                                        />
-                                        <BaseButton
-                                            color="danger"
-                                            :icon="mdiClose"
-                                            small
-                                            @click="
-                                                acceptance(request.id, 'reject')
-                                            "
-                                        />
-                                    </BaseButtons>
+                                        <BaseButtons
+                                            type="justify-start lg:justify-end"
+                                            no-wrap
+                                        >
+                                            <BaseButton
+                                                color="info"
+                                                :icon="mdiCheck"
+                                                small
+                                                @click="
+                                                    acceptance(
+                                                        request.id,
+                                                        'accept'
+                                                    )
+                                                "
+                                            />
+                                            <BaseButton
+                                                color="danger"
+                                                :icon="mdiClose"
+                                                small
+                                                @click="
+                                                    acceptance(
+                                                        request.id,
+                                                        'reject'
+                                                    )
+                                                "
+                                            />
+                                        </BaseButtons>
+                                    </template>
+
+                                    <template
+                                        v-else-if="
+                                            request.status === 'accepted'
+                                        "
+                                    >
+                                        <BaseButtons
+                                            type="justify-start lg:justify-end"
+                                            no-wrap
+                                        >
+                                            <BaseButton
+                                                color="success"
+                                                label="Finish"
+                                                small
+                                                @click="
+                                                    acceptance(
+                                                        request.id,
+                                                        'finished'
+                                                    )
+                                                "
+                                            />
+                                            <BaseButton
+                                                color="warning"
+                                                label="Missed"
+                                                small
+                                                @click="
+                                                    acceptance(
+                                                        request.id,
+                                                        'missed'
+                                                    )
+                                                "
+                                            />
+                                        </BaseButtons>
+                                    </template>
                                 </div>
                             </td>
                         </tr>

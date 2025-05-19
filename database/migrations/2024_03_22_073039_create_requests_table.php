@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('requests', function (Blueprint $table) {
@@ -27,7 +24,7 @@ return new class extends Migration
         Schema::create('visitors', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->char('uuid', 36);
-            $table->string('ktp');
+            $table->string('ktp')->nullable();
             $table->string('name');
             $table->string('file_ktp');
             $table->string('file_nda')->nullable();
