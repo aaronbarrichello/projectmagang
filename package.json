@@ -32,6 +32,7 @@
         "datatables.net-dt": "^2.0.2",
         "datatables.net-vue3": "^3.0.1",
         "dayjs": "^1.11.13",
+        "html5-qrcode": "^2.3.8",
         "vue-chartjs": "^5.3.1",
         "vue-qrcode-reader": "^5.5.3"
     }

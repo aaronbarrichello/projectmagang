@@ -16,11 +16,7 @@ const { form } = defineProps({
 
 const styleStore = useStyleStore();
 
-const puposes = [
-    "Data Center",
-    "Network Center",
-    "Network Operation Center",
-];
+const puposes = ["Data Center", "Network Center", "Network Operation Center"];
 
 const startTime = ref({ hours: 8, minutes: 0 });
 const minTime = ref({ hours: 8, minutes: 0 });
@@ -128,17 +124,10 @@ const disabledEndDate = computed(() => form.start_date === "");
         >
             {{ form.progress.percentage }}%
         </progress>
-        <div
-            class="text-red-400 text-sm"
-            v-if="form.errors.spk"
-        >
+        <div class="text-red-400 text-sm" v-if="form.errors.spk">
             {{ form.errors.spk }}
         </div>
-        <div class="text-gray-400 text-sm">
-            Format file yang didukung: PDF
-        </div>
-        <div class="text-gray-400 text-sm">
-            Max 250KB
-        </div>
+        <div class="text-gray-400 text-sm">Format file yang didukung: PDF</div>
+        <div class="text-gray-400 text-sm">Max 250KB</div>
     </FormField>
 </template>

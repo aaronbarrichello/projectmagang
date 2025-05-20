@@ -21,20 +21,25 @@ class StoreVisitRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'visit_purpose' => ['required', 'string', 'max:255'],
-            'start_date' => ['required', 'date', 'after_or_equal:now'],
-            'end_date' => ['required', 'date', 'after:start_date'],
-            'description' => ['nullable', 'string'],
-            'spk' => ['nullable', 'file'],
-            'visitors' => ['required', 'array', 'min:1'],
-            'visitors.*.name' => ['required', 'string'],
-            'visitors.*.file_ktp' => ['required', 'file'],
+            'visit_purpose' => ['required'],
+            'start_date' => ['required'],
+            'end_date' => ['required'],
+            'description' => ['required'],
+            'spk' => ['nullable', File::types(['pdf'])->max('250kb')],
+            'visitors' => ['array', 'min:1'],
+            'visitors.*.ktp' => ['required'],
+            'visitors.*.name' => ['required'],
+            'visitors.*.file_ktp' => ['required', File::types(['png','jpg','jpeg'])->max('250kb')],
+            'visitors.*.company' => ['required'],
+            'visitors.*.occupation' => ['required'],
+            'visitors.*.phone' => ['required'],
+            'visitors.*.email' => ['required', 'ends_with:gmail.com'],
+            // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         ];
     }
-
 
     public function messages(): array
     {

@@ -49,22 +49,7 @@ const deleteVisitor = (index) => {
 };
 
 const submit = () => {
-    const now = new Date();
-    const startDate = new Date(form.start_date);
-    const endDate = new Date(form.end_date);
-
-    if (startDate < now) {
-        alert("Start date must be in the future.");
-        return;
-    }
-
-    if (endDate <= startDate) {
-        alert("End date must be after the start date.");
-        return;
-    }
-
     form.visitors = dataVisitors;
-
     form.post(route("form.visit.store"), {
         onSuccess: () => {
             form.reset(); // Reset form setelah submit
@@ -99,7 +84,6 @@ const submit = () => {
             >
                 {{ $page.props.flash.message }}
             </NotificationBar>
-
             <div class="flex flex-col lg:flex-row w-full">
                 <div
                     class="w-full lg:h-screen lg:w-1/3 flex flex-col justify-between items-center lg:fixed pt-10 gap-5 lg:py-10 dark:bg-slate-900/70 bg-white"
@@ -141,7 +125,6 @@ const submit = () => {
                         />
                     </div>
                 </div>
-
                 <form
                     @submit.prevent="submit"
                     class="relative lg:left-1/3 w-full lg:w-2/3 flex flex-col p-8 dark:bg-slate-900/70 bg-white"
@@ -155,7 +138,6 @@ const submit = () => {
                                 <VisitDetail :form="form" />
                             </div>
                         </div>
-
                         <div class="w-full lg:w-50">
                             <div
                                 class="border-b border-slate-400 pb-4 flex justify-between"
@@ -181,7 +163,6 @@ const submit = () => {
                             </div>
                         </div>
                     </div>
-
                     <div
                         class="flex flex-col lg:flex-row gap-5 justify-between pt-5 border-t-2 mt-5"
                     >

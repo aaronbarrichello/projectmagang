@@ -5,7 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\ScannerController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +33,12 @@ Route::middleware('auth')->group(function () {
     Route::get('edit-account-info', [ProfileController::class, 'accountInfo'])->name('account.info');
     Route::post('edit-account-info', [ProfileController::class, 'accountInfoStore'])->name('account.info.store');
     Route::post('change-password', [ProfileController::class, 'changePasswordStore'])->name('account.password.store');
+    Route::get('/scan', [ScanController::class, 'index'])->name('scan.index');
+
+    Route::prefix('api')->group(function () {
+        Route::get('/scan/verify/{uuid}', [ScanController::class, 'verify'])->name('scan.verify');
+        Route::post('/scan/check-in', [ScanController::class, 'checkIn'])->name('scan.check-in');
+    });
 
     // Role & User management
     Route::resource('roles', RoleController::class)->middleware(['role:superadmin', 'permission:role-list|role-create|role-edit|role-delete']);
@@ -56,7 +62,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{id}/reject', [UserController::class, 'reject'])->name('user.reject');
 
     // Scanner and analytics
-    Route::get('scanner', [ScannerController::class, 'index'])->name('scanner.index');
+    Route::get('scanner', [ScanController::class, 'index'])->name('scanner.index');
     Route::get('analytic', [AnalyticController::class, 'index'])->name('analytic');
     Route::get('request-export/{year}/{month}', [AnalyticController::class, 'export'])->name('request.export');
 });

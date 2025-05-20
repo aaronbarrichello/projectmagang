@@ -18,7 +18,6 @@ import SectionTitleLineWithButton from "@/Components/SectionTitleLineWithButton.
 import CardBox from "@/Components/CardBox.vue";
 import CardBoxWidget from "@/Components/CardBoxWidget.vue";
 import TableLatestRequest from "@/Components/TableLatestRequest.vue";
-import TableUpcomingVisit from "@/Components/TableUpcomingVisit.vue";
 
 const props = defineProps({
     dataTotals: {
@@ -26,10 +25,6 @@ const props = defineProps({
         default: () => ({}),
     },
     latestRequest: {
-        type: Array,
-        default: () => [],
-    },
-    upcomingVisit: {
         type: Array,
         default: () => [],
     },
@@ -45,13 +40,6 @@ const columnLatestRequest = ref([
     "Visit Purpose",
     "Visitor (PIC)",
     "Status",
-]);
-
-const columnUpcomingVisit = ref([
-    "Start Date",
-    "End Date",
-    "Visit Purpose",
-    "Visitor (PIC)",
 ]);
 </script>
 
@@ -122,12 +110,6 @@ const columnUpcomingVisit = ref([
                     <TableLatestRequest
                         :columns="columnLatestRequest"
                         :datas="latestRequest"
-                    />
-                </CardBox>
-                <CardBox title="Upcoming Visit" :hasTable="true">
-                    <TableUpcomingVisit
-                        :columns="columnUpcomingVisit"
-                        :datas="upcomingVisit"
                     />
                 </CardBox>
             </div>

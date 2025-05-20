@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Mail\VisitApproved;
+use Illuminate\Support\Facades\Mail;
 
 class RequestController extends Controller
 {
@@ -163,5 +166,73 @@ class RequestController extends Controller
         ]);
 
         return response()->file(storage_path('app/' . $filePath));
+    }
+
+    private function generateQRCode($request)
+    {
+        try {
+            // Pastikan direktori ada
+            $qrCodeDir = storage_path('app/public/qrcodes');
+            if (!file_exists($qrCodeDir)) {
+                mkdir($qrCodeDir, 0755, true);
+            }
+            
+            // Generate data untuk QR code (enkripsi UUID untuk keamanan)
+            $qrData = [
+                'uuid' => $request->uuid,
+                'timestamp' => time(),
+                'type' => 'visit'
+            ];
+            
+            $encryptedData = encrypt(json_encode($qrData));
+            
+            // Generate QR code dengan data terenkripsi
+            $qrCode = QrCode::format('png')
+                            ->size(300)
+                            ->errorCorrection('H')
+                            ->margin(1)
+                            ->generate($encryptedData);
+            
+            // Simpan QR code dengan nama unik
+            $qrCodePath = 'qrcodes/' . $request->uuid . '_' . time() . '.png';
+            Storage::disk('public')->put($qrCodePath, $qrCode);
+            
+            // Update request dengan path QR code
+            $request->qrcode = $qrCodePath;
+            $request->save();
+            
+            return asset('storage/' . $qrCodePath);
+        } catch (\Exception $e) {
+            Log::error('QR Code generation failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    // Metode untuk mengirim email di RequestController
+    private function sendApprovalEmail($request)
+    {
+        try {
+            // Dapatkan PIC visitor
+            $picVisitor = $request->visitors()->where('pic', true)->first();
+            
+            if ($picVisitor && $picVisitor->email) {
+                // Generate QR code dan dapatkan URL-nya
+                $qrCodeUrl = $this->generateQRCode($request);
+                
+                if ($qrCodeUrl) {
+                    // Kirim email dengan QR code
+                    Mail::to($picVisitor->email)
+                        ->queue(new VisitApproved($request, $picVisitor, $qrCodeUrl));
+                    
+                    Log::info('Approval email sent to: ' . $picVisitor->email);
+                    return true;
+                }
+            }
+            
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Failed to send approval email: ' . $e->getMessage());
+            return false;
+        }
     }
 }
